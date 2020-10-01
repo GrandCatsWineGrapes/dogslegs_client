@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {FormControl, Select, InputLabel, MenuItem, makeStyles} from '@material-ui/core'
 
 const useStyles = makeStyles((theme) => ({
@@ -10,12 +10,23 @@ const useStyles = makeStyles((theme) => ({
 
 export default function LayoutForm() {
     const [test, setTest] = useState('')
+    const [layouts, setLayouts] = useState([])
     
     const handleChange = (ev: React.ChangeEvent<{ value: unknown }>) => {
         setTest(ev.target.value as string)
     }
+    function fetcher(url: string, setter: Function) {
+        fetch(url)
+            .then(res => res.json())
+            .then(formattedData => setter(formattedData))
+    }
 
     const classes = useStyles();
+
+
+    useEffect(() => {
+        fetcher('http://127.0.0.1:3000/layout/all', setLayouts)
+    }, [])
 
     return(
         <div>
@@ -26,7 +37,8 @@ export default function LayoutForm() {
                     value={test}
                     onChange={handleChange}
                 >
-                    <MenuItem value = "Stop">Stop</MenuItem>
+                    {layouts.map(el =><MenuItem value={el.name}>{el}</MenuItem>)}
+                    {/* <MenuItem value = {}>Stop</MenuItem> */}
                 </Select>
             </FormControl>
         </div>
