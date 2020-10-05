@@ -1,7 +1,9 @@
 import React, {useState, useEffect} from 'react';
 import {FormControl, Select, InputLabel, MenuItem, makeStyles, TextField} from '@material-ui/core'
 import ReactDOM from 'react-dom'
-import parse from 'html-react-parser'
+import parse from 'html-react-parser' //to delete
+// to develop
+// import {layoutStringParser} from '../utils/layoutWorker'
 
 export interface ILayout {
     _id?: string,
@@ -11,7 +13,6 @@ export interface ILayout {
     russian_name: string,
     priority: number
 }
-
 const useStyles = makeStyles((theme) => ({
     testClass: {
         minWidth: 120,
@@ -39,33 +40,19 @@ function fetcher(url: string, setter: Function) {
         .then()
 }
 
-function layoutStringParser(layoutString: string) {
-    // console.log(layoutString)
-    const arrayFromLayoutString = layoutString.split('');
-    let isVariableSpace: boolean = false
-    let toSliceIndexes: number[] = [];
-    arrayFromLayoutString.forEach((el, index) => {
-        if (el === '$' && arrayFromLayoutString[index+1] === '{') {
-            isVariableSpace = true;
-            toSliceIndexes.push(index)
-        }
-        if (el === '}' && isVariableSpace) {
-            isVariableSpace = false;
-            toSliceIndexes.push(index)
-        }
-    })
-    
-    let toSliceStrings: string[] = []
-    for(let i = 0; i<toSliceIndexes.length; i+=2) {
-        toSliceStrings.push(layoutString.slice(toSliceIndexes[i], toSliceIndexes[i+1]+1))
-    }
-
-    // toSliceStrings.forEach(el => layoutString = layoutString.replace(el, '|||'))
-    // layoutString = layoutString.replace('`', '')
-    
-    return parse(layoutString)
-
+function makeLayout() {
+    let formEl = document.querySelector('#LayoutForm')
+    let data: any = [];
+    console.log(formEl ? formEl.querySelectorAll('input.test') : '')
+    if (formEl) formEl.querySelectorAll('input.test').forEach(el => data.push(el.getAttribute('value')));
+    console.log(data)
+    // fetch(`http://127.0.0.1:3000/automaton/${id}`, {
+    //     method: 'POST',
+    //     body: JSON.stringify(data)
+    // })
+    //     .then(layout => layout.json())
 }
+
 
 function findLayoutByName(layouts: ILayout[], name: string): number {
     let res: number = -1
@@ -85,6 +72,8 @@ export default function LayoutForm() {
     })
     const [layouts, setLayouts] = useState<ILayout[]>([])
     
+    const [sobaka, setSobaka] = useState('')
+
     const handleChange = (ev: React.ChangeEvent<{ value: unknown }>) => {
         const layoutIndex = findLayoutByName(layouts, ev.target.value as string)
         if (~layoutIndex) setSelectedLayout(layouts[layoutIndex])
@@ -99,37 +88,48 @@ export default function LayoutForm() {
     }, [])
 
     useEffect(() => {
+        let isMounted = true;
         if (layouts[0]) {
             console.log(layouts[0].name)
         }
+        return () => {isMounted=false}    
     }, [layouts])
+
+    useEffect(() => {
+        ReactDOM.render(React.createElement('div', {}, <TextField value = {selectedLayout.name} />), document.getElementById('test'))
+    }, [selectedLayout])
+
+    const handleText = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSobaka(event.target.value);
+      };
 
     return(
         <div>
-            <FormControl className = {classes.testClass}>
-            <div>{}</div>
-                <InputLabel id = "selectHandler">Проблема</InputLabel>
-                <Select 
-                    labelId="selectHandler"
-                    value={selectedLayout.name}
-                    onChange={handleChange}
-                    className={classes.selectHandler}
-                    autoWidth
-                >
-                    {layouts && layouts.map(el => {
-                        if (el){
-                        return (<MenuItem key = {el.name} value={el.name}>{el.russian_name}</MenuItem>)
-                        }
-                    })}
-                </Select>
-                <div className={classes.variablesContainer}>
-                    {selectedLayout.name && selectedLayout.variables.split(', ').map(
-                        el => <TextField label = {el} key = {el} className = {classes.textField} variant='filled'/>
-                    )}
-                </div>
-                <div id="test">
-                    {layoutStringParser(selectedLayout.layout)}
-                </div>
+            <FormControl className = {classes.testClass} id = "LayoutForm">
+                
+                    <InputLabel id = "selectHandler">Проблема</InputLabel>
+                    <Select 
+                        labelId="selectHandler"
+                        value={selectedLayout.name}
+                        onChange={handleChange}
+                        className={classes.selectHandler}
+                        autoWidth
+                    >
+                        {layouts && layouts.map(el => {
+                            if (el){
+                            return (<MenuItem key = {el.name} value={el.name}>{el.russian_name}</MenuItem>)
+                            }
+                        })}
+                    </Select>
+                    <div className={classes.variablesContainer}>
+                        {selectedLayout.name && selectedLayout.variables.split(', ').map(
+                            el => <TextField label = {el} key = {el} className = {`${classes.textField} layoutVariable`} inputProps={{className: 'test'}} variant='filled' value={sobaka} onChange={handleText}/>
+                        )}
+                    </div>
+                    <button onClick={() => { makeLayout() }}>Send data</button>
+                    <div id="test">
+
+                    </div>
             </FormControl>
         </div>
     )
