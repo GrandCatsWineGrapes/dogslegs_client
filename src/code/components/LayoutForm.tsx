@@ -1,13 +1,28 @@
+import 'date-fns'
+import {format} from 'date-fns'
+import ruLocale from "date-fns/locale/ru";
 import React, {useState, useEffect} from 'react';
-import {FormControl, Select, InputLabel, MenuItem, makeStyles, TextField} from '@material-ui/core'
+import {
+    FormControl,
+    FormControlLabel, 
+    Select, 
+    InputLabel, 
+    MenuItem, 
+    makeStyles, 
+    TextField,
+    Switch
+} from '@material-ui/core'
 import ReactDOM from 'react-dom'
 import parse from 'html-react-parser' //to delete
 import DateFnsUtils from '@date-io/date-fns'
 import {
     MuiPickersUtilsProvider,
     KeyboardTimePicker,
-    KeyboardDatePicker,
-  } from '@material-ui/pickers';
+    KeyboardDatePicker
+} from '@material-ui/pickers';
+import { FlipRounded } from '@material-ui/icons';
+import { datePickerDefaultProps } from '@material-ui/pickers/constants/prop-types';
+
 // to develop
 // import {layoutStringParser} from '../utils/layoutWorker'
 
@@ -46,7 +61,8 @@ const useStyles = makeStyles((theme) => ({
     textField: {
         maxWidth: 300,
         marginRight: 20,
-        marginBottom: 15     
+        marginBottom: 15,
+        marginTop: 0
     },
     variablesContainer: {
         display: 'flex',
@@ -71,6 +87,11 @@ function findLayoutByName(layouts: ILayout[], name: string): number {
     return res
 }
 
+function isDate(input: any) {
+    if (Object.prototype.toString.call(input) === "[object Date]")
+        return true
+    return false
+}
 
 
 export default function LayoutForm() {
@@ -84,7 +105,7 @@ export default function LayoutForm() {
         priority: -1
     })
 
-    const [variablesMap, setVariablesMap] = useState<Map<string, string>>(new Map())
+    const [variablesMap, setVariablesMap] = useState<Map<string, any>>(new Map())
     const updateMap = (k: string,v: any) => { //Change any to suitable types
         setVariablesMap(new Map(variablesMap.set(k,v)))
     }
@@ -101,28 +122,89 @@ export default function LayoutForm() {
         if (~layoutIndex) setSelectedLayout(layouts[layoutIndex])
     }
 
+    const checkTimes = (type: string) => {
+        switch (type) {
+            case 'time':
+                const time_start = variablesMap.get('time_start')
+                const time_end = variablesMap.get('time_end');
+                if (time_end && time_start)
+                    if (time_end<time_start) return false
+                        else return true
+                    else return true
+                break;
+            case 'date':
+                const date_start = variablesMap.get('date_start')
+                const date_end = variablesMap.get('date_end');
+                if (date_end && date_start)
+                    if (date_end<date_start) return false
+                        else return true
+                    else return true
+                break;
+            default: 
+                throw new Error(`Incorrect type while checking time`)
+        }
+    }
+
     const classes = useStyles();
 
     //useEffect
 
     useEffect(() => {
         fetcher('http://127.0.0.1:3000/layout/all', setLayouts)
-        layouts.forEach(el => el.variables.forEach(el => updateMap(el.varName, '')))
+        layouts.forEach(el => el.variables.forEach(el => {
+            switch (el.type) {
+                case 'date':
+                    updateMap(el.varName, new Date())
+                    break;
+                case 'time': 
+                    updateMap(el.varName, new Date())
+                    break;
+                case 'string': 
+                    updateMap(el.varName, '')
+                    break;
+                case 'boolean':
+                    updateMap(el.varName, null)
+                    break;
+                case 'number':
+                    updateMap(el.varName, 0)
+                    break;
+
+            }
+
+        }))
     }, [])
 
     useEffect(() => {
         variablesMap.clear();
-        layouts.forEach(el => el.variables.forEach(el => updateMap(el.varName, '')))
-        console.log('here')
+        layouts.forEach(el => el.variables.forEach(el => {
+            switch (el.type) {
+                case 'date':
+                    updateMap(el.varName, new Date())
+                    break;
+                case 'time':
+                    updateMap(el.varName, new Date());
+                    break;
+                case 'string': 
+                    updateMap(el.varName, '')
+                    break;
+                case 'boolean':
+                    updateMap(el.varName, null)
+                    break;
+                case 'number':
+                    updateMap(el.varName, 0)
+                    break;
+            }
+
+        }))
 
     }, [selectedLayout])
 
     useEffect(() => {
-        let isMounted = true;
+        // let isMounted = true;
         if (layouts[0]) {
             console.log(layouts[0].name)
         }
-        return () => {isMounted=false}    
+        // return () => {isMounted=false}    
     }, [layouts])
 
     // useEffect(() => {
@@ -134,25 +216,69 @@ export default function LayoutForm() {
     const handleText = ( el: string, event: React.ChangeEvent<HTMLInputElement>) => {
         event.preventDefault();
         updateMap(el, event.target.value);
-        console.log('Updated Map')
     };
 
     function handleDateChange(el: string, date: Date|null) {
-        updateMap()
+        updateMap(el, date)
+    }
+
+    function handleSwitch(el: string, event: React.ChangeEvent<HTMLInputElement>) {
+        updateMap(el, event.target.checked);
     }
     
     function useField(el: IL_variable) {
         let field = <div>ErrorDIV</div>
         switch (el.type) {
             case 'date':
-                field = <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                        <KeyboardDatePicker 
-                            margin="normal"
-                            label={el.russian_varName}
-                            value={variablesMap.get(el.varName)}
-                            onChange={() => {handleDateChange(el.varName, date)}}
-                        />
-                    </MuiPickersUtilsProvider>
+                field = <MuiPickersUtilsProvider key={el.varName} utils={DateFnsUtils} locale={ruLocale}>
+                            <KeyboardDatePicker 
+                                // clearable
+                                error={!checkTimes('date')}
+                                minDate = {new Date(2000, 1, 1)}
+                                margin="none"
+                                label={el.russian_varName}
+                                value={variablesMap.get(el.varName) || null}
+                                onChange={(date) => {handleDateChange(el.varName, date)}}
+                                className = {`${classes.textField} layoutVariable`} 
+                                inputVariant = "filled"
+                                variant = "inline"
+                                inputProps={{className: 'test'}} 
+                                format="dd.MM.yyyy"
+                            />
+                        </MuiPickersUtilsProvider>
+                break;
+            case 'time': 
+                field = <MuiPickersUtilsProvider key={el.varName} utils={DateFnsUtils} locale={ruLocale}>
+                            <KeyboardTimePicker
+                                error={!checkTimes('time')}
+                                key={el.varName}
+                                format="HH:mm"
+                                label = {el.russian_varName}
+                                value = {variablesMap.get(el.varName) || null}
+                                onChange = {(time) => handleDateChange(el.varName, time)}
+                                placeholder="06:00"
+                                ampm={false}
+                                variant="inline"
+                                inputVariant="filled"
+                                inputProps={{className: 'test'}}
+                                className = {`${classes.textField} layoutVariable`} 
+                            />
+                        </MuiPickersUtilsProvider>
+                        break;
+            case 'boolean':
+                field = <React.Fragment key ={el.varName}></React.Fragment>
+                const switchEl = <FormControlLabel key = {el.varName}
+                        control = {
+                            <Switch
+                                checked={variablesMap.get(el.varName) || false}
+                                name={el.varName}
+                                onChange={(state) => {handleSwitch(el.varName, state)}}
+                                inputProps={{ 'aria-label': 'secondary checkbox' }}
+                            />}
+                label = {el.russian_varName}
+                />
+                ReactDOM.render(switchEl, document.getElementById('check'));
+                
                 break;
             default: 
                 field = <TextField 
@@ -161,7 +287,7 @@ export default function LayoutForm() {
                     className = {`${classes.textField} layoutVariable`} 
                     inputProps={{className: 'test'}} 
                     variant='filled' 
-                    value={variablesMap.get(el.varName)} 
+                    value={variablesMap.get(el.varName) || ''} 
                     onChange={(ev: React.ChangeEvent<HTMLInputElement>) => {handleText(el.varName, ev)}}
                 />
         }
@@ -171,19 +297,21 @@ export default function LayoutForm() {
 
     
     function makeLayout(id: string) {
-        // let formEl = document.querySelector('#LayoutForm')
-        // let data: any = [];
-        // console.log(formEl ? formEl.querySelectorAll('input.test') : '')
-        // if (formEl) formEl.querySelectorAll('input.test').forEach(el => data.push(el.getAttribute('value')));
-        // console.log(data)
-        // fetch(`http://127.0.0.1:3000/automaton/${id}`, {
-        //     method: 'POST',
-        //     body: JSON.stringify(data)
-        // })
-        //     .then(layout => layout.json())
         let data: any = [];
-        for (const el of variablesMap.values()) {
-            if (el) data.push(el)
+        
+        for (const key of selectedLayout.variables) {
+            let el = variablesMap.get(key.varName)
+            switch (key.type) {
+                case 'date':
+                    data.push(format(el, 'dd.MM.yyyy'));
+                    break;
+                case 'time':
+                    data.push(format(el, 'HH:mm'))
+                    break;
+                default:
+                    data.push(el)
+            }
+               
         }
         console.log(data)
         
@@ -222,11 +350,19 @@ export default function LayoutForm() {
                             el => useField(el)
                         )}
                     </div>
+                    <div id="check"></div>
                     <button onClick={() => { selectedLayout._id ? makeLayout(selectedLayout._id) : alert(`Error in selectedLayout: id is undefined`); console.log(variablesMap) }}>Send data</button>
                     <div id="test">
 
                     </div>
-                    {formedLayout && formedLayout}
+                    {formedLayout &&    
+                        <TextField
+                            label="Сформированный шаблон"
+                            multiline
+                            value={formedLayout}
+                            variant="filled"
+                        >
+                        </TextField>}
             </FormControl>
         </div>
     )
