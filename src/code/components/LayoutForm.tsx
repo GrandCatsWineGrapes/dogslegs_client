@@ -35,10 +35,15 @@ import { datePickerDefaultProps } from '@material-ui/pickers/constants/prop-type
 //     priority: number
 // }
 
+export interface IInnerVars {
+    [key: string]: string
+}
+
 export interface IL_variable {
     varName: string,
     type: string,
-    russian_varName: string
+    russian_varName: string,
+    innerVars?: IInnerVars
 }
 
 export interface ILayout {
@@ -168,6 +173,9 @@ export default function LayoutForm() {
                 case 'number':
                     updateMap(el.varName, 0)
                     break;
+                case 'select':
+                    updateMap(el.varName, [])
+                    break;
 
             }
 
@@ -192,6 +200,9 @@ export default function LayoutForm() {
                     break;
                 case 'number':
                     updateMap(el.varName, 0)
+                    break;
+                case 'select':
+                    updateMap(el.varName, '')
                     break;
             }
 
@@ -224,6 +235,21 @@ export default function LayoutForm() {
 
     function handleSwitch(el: string, event: React.ChangeEvent<HTMLInputElement>) {
         updateMap(el, event.target.checked);
+    }
+
+    function useMenuItems(fields: IInnerVars|undefined) {
+        let menuItemsArray = []
+        let key: string;
+        if (fields) {
+            for(key in fields) {
+                console.log(`key = ${key}`)
+                menuItemsArray.push(<MenuItem 
+                    value = {key}>
+                        {fields[key] && fields[key]}
+                </MenuItem>)
+            }
+        }
+        return menuItemsArray
     }
     
     function useField(el: IL_variable) {
@@ -279,6 +305,18 @@ export default function LayoutForm() {
                 />
                 ReactDOM.render(switchEl, document.getElementById('check'));
                 
+                break;
+            case 'select':
+                field=
+                    <FormControl key={el.varName}>
+                        <InputLabel id={el.varName}>{el.russian_varName}</InputLabel>
+                        <Select
+                                labelId={el.varName}
+                                value={el.varName}
+                        >
+                            {el.innerVars && useMenuItems(el.innerVars)}
+                        </Select>
+                    </FormControl>
                 break;
             default: 
                 field = <TextField 
@@ -345,25 +383,25 @@ export default function LayoutForm() {
                             }
                         })}
                     </Select>
-                    <div className={classes.variablesContainer}>
-                        {selectedLayout.name && selectedLayout.variables.map(
-                            el => useField(el)
-                        )}
-                    </div>
-                    <div id="check"></div>
-                    <button onClick={() => { selectedLayout._id ? makeLayout(selectedLayout._id) : alert(`Error in selectedLayout: id is undefined`); console.log(variablesMap) }}>Send data</button>
-                    <div id="test">
+                </FormControl>
+                <div className={classes.variablesContainer}>
+                    {selectedLayout.name && selectedLayout.variables.map(
+                        el => useField(el)
+                    )}
+                </div>
+                <div id="check"></div>
+                <button onClick={() => { selectedLayout._id ? makeLayout(selectedLayout._id) : alert(`Error in selectedLayout: id is undefined`); console.log(variablesMap) }}>Send data</button>
+                <div id="test">
 
-                    </div>
-                    {formedLayout &&    
-                        <TextField
-                            label="Сформированный шаблон"
-                            multiline
-                            value={formedLayout}
-                            variant="filled"
-                        >
-                        </TextField>}
-            </FormControl>
+                </div>
+                {formedLayout &&    
+                    <TextField
+                        label="Сформированный шаблон"
+                        multiline
+                        value={formedLayout}
+                        variant="filled"
+                    >
+                    </TextField>}
         </div>
     )
 }

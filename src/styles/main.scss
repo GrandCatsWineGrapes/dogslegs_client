@@ -1,3 +1,29 @@
+@import './imports/colors';
+@import './imports/variables';
+
 body {
-    background-color: #ebebeb;
+    // background-color: #ebebeb;
+}
+
+.main-wrapper {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    width: 100vw;
+    height: 100vh;
+    background-color: $honeydew;
+    .ls-menu {
+        background-color: $honeydew;
+        height: inherit;
+        background-image: $noise-background-image;
+        // -webkit-box-shadow: 9px 12px 12px -6px rgba(0,0,0,0.58);
+        // -moz-box-shadow: 9px 12px 12px -6px rgba(0,0,0,0.58);
+        // box-shadow: 9px 12px 12px -6px rgba(0,0,0,0.58);
+        border-right: dashed 2px #181818;
+    }
+    
+    .content {
+        height: inherit;
+    }
+    
+    
 }

@@ -8,7 +8,14 @@ export function BaseLayout() {
 
     return (
         <div id="app">
-            <LayoutForm/>
+            <div className="main-wrapper">
+                <div className="ls-menu">
+                    test
+                </div>
+                <div className="content">
+                    <LayoutForm/>
+                </div>
+            </div>
         </div>
     )
 }
