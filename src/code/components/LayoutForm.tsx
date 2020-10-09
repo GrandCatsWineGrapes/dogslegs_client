@@ -73,6 +73,15 @@ const useStyles = makeStyles((theme) => ({
         display: 'flex',
         flexWrap: 'wrap',
         marginTop: 15
+    },
+    selectField: {
+        maxWidth: 400,
+        minWidth: 200,
+        marginRight: 20,
+        marginBottom: 15,
+    },
+    multiRow: {
+        minWidth: 600
     }
 }))
 
@@ -242,9 +251,9 @@ export default function LayoutForm() {
         let key: string;
         if (fields) {
             for(key in fields) {
-                console.log(`key = ${key}`)
                 menuItemsArray.push(<MenuItem 
-                    value = {key}>
+                    value = {key}
+                    key = {key}>
                         {fields[key] && fields[key]}
                 </MenuItem>)
             }
@@ -312,7 +321,10 @@ export default function LayoutForm() {
                         <InputLabel id={el.varName}>{el.russian_varName}</InputLabel>
                         <Select
                                 labelId={el.varName}
-                                value={el.varName}
+                                value=""
+                                className={classes.selectField}
+                                autoWidth
+                                variant="filled"
                         >
                             {el.innerVars && useMenuItems(el.innerVars)}
                         </Select>
@@ -400,6 +412,7 @@ export default function LayoutForm() {
                         multiline
                         value={formedLayout}
                         variant="filled"
+                        className={classes.multiRow}
                     >
                     </TextField>}
         </div>
