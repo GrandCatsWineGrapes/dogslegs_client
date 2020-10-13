@@ -130,11 +130,7 @@ export default function LayoutForm() {
 
     const [formedLayout, setFormedLayout] = useState('');
 
-    const handleChange = (ev: React.ChangeEvent<{ value: unknown }>) => {
-        // clearValuesMap();
-        const layoutIndex = findLayoutByName(layouts, ev.target.value as string)
-        if (~layoutIndex) setSelectedLayout(layouts[layoutIndex])
-    }
+    const [innerSelectItems, setInnerSelectItems] = useState('')
 
     const checkTimes = (type: string) => {
         switch (type) {
@@ -183,7 +179,7 @@ export default function LayoutForm() {
                     updateMap(el.varName, 0)
                     break;
                 case 'select':
-                    updateMap(el.varName, [])
+                    updateMap(el.varName, '')
                     break;
 
             }
@@ -246,6 +242,22 @@ export default function LayoutForm() {
         updateMap(el, event.target.checked);
     }
 
+    const handleChange = (ev: React.ChangeEvent<{ value: unknown }>) => {
+        // clearValuesMap();
+        const layoutIndex = findLayoutByName(layouts, ev.target.value as string)
+        if (~layoutIndex) setSelectedLayout(layouts[layoutIndex])
+    }
+
+    const handleInnerSelects = (el: string, ev: React.ChangeEvent<{ value: unknown }>) => {
+        updateMap(el, ev.target.value as string)
+    }
+
+    const handleFormedLayout = (ev: React.ChangeEvent<HTMLInputElement>) => {
+        setFormedLayout(ev.target.value as string)
+    } 
+
+
+
     function useMenuItems(fields: IInnerVars|undefined) {
         let menuItemsArray = []
         let key: string;
@@ -258,6 +270,7 @@ export default function LayoutForm() {
                 </MenuItem>)
             }
         }
+
         return menuItemsArray
     }
     
@@ -321,10 +334,12 @@ export default function LayoutForm() {
                         <InputLabel id={el.varName}>{el.russian_varName}</InputLabel>
                         <Select
                                 labelId={el.varName}
-                                value=""
+                                value={variablesMap.get(el.varName) || ''}
                                 className={classes.selectField}
                                 autoWidth
-                                variant="filled"
+                                variant="outlined"
+                                onChange={(ev) => {handleInnerSelects(el.varName, ev)}}
+                                inputProps={{style: {margin: 3}}}
                         >
                             {el.innerVars && useMenuItems(el.innerVars)}
                         </Select>
@@ -413,6 +428,7 @@ export default function LayoutForm() {
                         value={formedLayout}
                         variant="filled"
                         className={classes.multiRow}
+                        onChange={handleFormedLayout}
                     >
                     </TextField>}
         </div>
