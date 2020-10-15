@@ -7,10 +7,11 @@ import LeftSideMenu from './LeftSideMenu';
 
 import 'normalize.css'
 import '../../styles/main.scss'
+import { LayoutCompositeComponent } from './LayoutCreator';
 
 
 export function BaseLayout() {
-
+    console.log('render')
     return (
         <div id="app">
             <div className="main-wrapper">
@@ -30,7 +31,9 @@ export function BaseLayout() {
                                 Placeolder newlayout
                             </Route>
                             <Route path="/test">
-                                Tests for now
+                                <h1>Tests for now:</h1>
+                                <h3>Layout composite:</h3>
+                                <LayoutCompositeComponent />
                             </Route>
                         </Switch>
                     </div>
