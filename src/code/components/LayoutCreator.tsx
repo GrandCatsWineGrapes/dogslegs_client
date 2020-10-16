@@ -7,11 +7,11 @@ import {BranchNode, LeafStrNode, LeafVarBuilder} from '../utils/Stringy'
 export function LayoutCompositeComponent() {
     const root = BranchNode.createRoot();
 
-    root.form()
+    root.push()
         .leafVar('Test', 'InputText')
 
 
-    root.form()
+    root.push()
             .branch([
                 new LeafStrNode(),
                 new LeafVarBuilder()
@@ -21,7 +21,7 @@ export function LayoutCompositeComponent() {
                     .setOperator('&&')
                     .setType('SwitchBool')
                     .build(),
-            ]).form()
+            ]).push()
                 .branch([
                     new LeafVarBuilder()
                         .setName('Test from child branch')
@@ -30,11 +30,20 @@ export function LayoutCompositeComponent() {
                     new LeafStrNode()
                 ])
 
+
+    const rootPipe = BranchNode.createRoot();
+    
+    rootPipe
+        .push()
+            .branch()
+                .push()
+                    .branch()
+
     console.log(root.getObject())
 
 
     return (
-        <div>test</div>
+        <div>{JSON.stringify(root.getObject())}</div>
     )
 }
 

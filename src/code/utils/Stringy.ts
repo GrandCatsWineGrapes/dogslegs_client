@@ -72,7 +72,7 @@ class BranchNode extends Stringy {
      * Forming leafNode. 
      * @returns an object with two methods: leafStr and leafVar
      */
-    public form() {
+    public push() {
         return {
             leafStr: (basicString: string) => {
                 const leaf = new LeafStrNode(this);
@@ -97,12 +97,20 @@ class BranchNode extends Stringy {
                         branch.add(child)
                     })
                 return branch;
-            }
+            },
+
         }
     }
 }
 
+// class BranchBuilder {
+//     private _branch: BranchNode;
+//     constructor(parent: IBranchNode | null = null) {
+//         this._branch = new BranchNode(parent)
+//     }
 
+//     leafStr(basicString:) {}
+// }
 
 class LeafVarBuilder {
     private _leaf: LeafVarNode;
