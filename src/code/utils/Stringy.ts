@@ -6,10 +6,22 @@ declare type TStringyVariable= 'InputText' | 'InputDate' | 'InputTime' | 'Switch
 
 interface IBranchNode {
     add(child: Stringy): void;
+    push(): any;
     
 }
 
+interface IPush {
+    leafVar(name: string, type: TStringyVariable, operator?: TOperator): IPush,
+    leafStr(basicString: string): IPush,
+    branch(): {
+        in: IPush,
+        $: IPush
+    },
+    out(): IPush
+}
+
 abstract class Stringy {
+    abstract baseType: string;
     protected _parent: IBranchNode | null;
     constructor (parent: IBranchNode | null = null) {
         this._parent = parent;
@@ -29,6 +41,7 @@ abstract class Stringy {
 
 class BranchNode extends Stringy {
     private _children: Stringy[] = [];
+    readonly baseType = 'BranchNode' 
     public add(child: Stringy) {
         this._children.push(child);
     }
@@ -47,12 +60,20 @@ class BranchNode extends Stringy {
     }
 
     public getString() {
-        return this._children.map(child => child.getString()).join()
+        return this._children.map(child => child.getString()).join('')
     }
 
     public getChild(index: number) {
+        const len = this._children.length;
+        if (index>len || index<0) throw new Error(`Error in BranchNode.getChild() - this element has no child with index ${index}`)
         return this._children[index];
     }
+
+    public getLastChild() {
+        return this.getChild(this._children.length-1)
+    }
+
+
     /**
      * Forming new branch 
      * @param children If there are any, you can push children directly in the root.
@@ -72,12 +93,12 @@ class BranchNode extends Stringy {
      * Forming leafNode. 
      * @returns an object with two methods: leafStr and leafVar
      */
-    public push() {
+    public push(): IPush {
         return {
-            leafStr: (basicString: string) => {
+            leafStr: (basicString: string): IPush => {
                 const leaf = new LeafStrNode(this);
                 leaf.basicString = basicString;
-                return leaf;
+                return this.push();
             },
             leafVar: (name: string, type: TStringyVariable, operator: TOperator | null = null) => {
 
@@ -87,7 +108,7 @@ class BranchNode extends Stringy {
                                         .setOperator(operator)
                 if (type === 'SwitchBool') leafBuilder.setOperator(null)
                 const leaf = leafBuilder.build();
-                return leaf;
+                return this.push();
             },
             branch: (children?: Stringy[]) => {
                 const branch = new BranchNode(this);
@@ -96,8 +117,18 @@ class BranchNode extends Stringy {
                         child.resetParent(branch)
                         branch.add(child)
                     })
-                return branch;
+                return {
+                    in: branch.push(),
+                    $: this.push()
+                };
             },
+            out: () => {
+                if (this.parent) return this.parent.push()
+                else {
+                    return this
+                }
+            },
+
 
         }
     }
@@ -159,6 +190,7 @@ class LeafVarBuilder {
 }
 
 class LeafStrNode extends Stringy{
+    readonly baseType = 'LeafStrNode';
     private _basicString: string = '';
 
     set basicString(string: string) {
@@ -182,6 +214,7 @@ class LeafVarNode extends Stringy {
     private _name: string = '';
     private _type: TStringyVariable = 'InputText';
     private _operator: TOperator = null;
+    readonly baseType = 'LeafVarNode';
     
 
     public getString() {

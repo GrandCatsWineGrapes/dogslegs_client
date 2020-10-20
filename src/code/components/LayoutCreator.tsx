@@ -8,38 +8,23 @@ export function LayoutCompositeComponent() {
     const root = BranchNode.createRoot();
 
     root.push()
-        .leafVar('Test', 'InputText')
-
-
-    root.push()
-            .branch([
-                new LeafStrNode(),
-                new LeafVarBuilder()
-                    .build(),
-                new LeafVarBuilder()
-                    .setName('Test from builder')
-                    .setOperator('&&')
-                    .setType('SwitchBool')
-                    .build(),
-            ]).push()
-                .branch([
-                    new LeafVarBuilder()
-                        .setName('Test from child branch')
-                        .setType('InputText')
-                        .build(),
-                    new LeafStrNode()
-                ])
-
-
-    const rootPipe = BranchNode.createRoot();
-    
-    rootPipe
-        .push()
+            .branch().$
             .branch()
-                .push()
-                    .branch()
+                .in.branch()
+                    .in.leafStr('Peklo ')
+                       .leafStr('Nogi ')
+                .out()
+                .branch().in
+                       .leafStr('Bogi + ')
+                       .leafVar('test','InputText').out()
+                       .branch()
+
+                            
+
+
 
     console.log(root.getObject())
+    console.log(root.getString())
 
 
     return (
