@@ -1,100 +1,101 @@
 import {LayoutComposite, LeafString, LeafVariable, TOperator, Layout} from '../utils/LayoutComposite'
-import React, {useState, useEffect, ReactElement} from 'react';
-import { TextField } from '@material-ui/core';
+import React, {useState, useEffect, ReactElement, FunctionComponent} from 'react';
+import { InputLabel, TextField, Button } from '@material-ui/core';
 
 import {BranchNode, LeafStrNode, LeafVarBuilder} from '../utils/Stringy'
+import { add } from 'date-fns';
 
-export function LayoutCompositeComponent() {
-    const root = BranchNode.createRoot();
+import '../../styles/LayoutCreator.scss'
 
-    root.push()
-            .branch().$
-            .branch()
-                .in.branch()
-                    .in.leafStr('Peklo ')
-                       .leafStr('Nogi ')
-                .out()
-                .branch().in
-                       .leafStr('Bogi + ')
-                       .leafVar('test','InputText').out()
-                       .branch()
+import hljs from 'highlight.js'
 
-                            
-
-
-
-    console.log(root.getObject())
-    console.log(root.getString())
-
-
-    return (
-        <div>{JSON.stringify(root.getObject())}</div>
-    )
+function formData(name: string, russian_name: string, variables: string, layoutString: string) {
+    return {
+        name,
+        russian_name,
+        variables: JSON.parse(`[${variables}]`),
+        layout: `\`${layoutString}\``,
+        priority: 3
+    }
 }
 
 
-// export function LayoutCompositeComponent() {
-//     const [inputLayout, setInputLayout] = useState<String>('')
-//     const [inputTree, setInputTree] = useState<LayoutComposite>(new LayoutComposite())
+function toDbDirectly(data: any) {
+    try {
+        fetch('http://127.0.0.1:3000/layout', {
+            method: 'POST',
+            body: JSON.stringify(data),
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(res => res.json())
+        .then(json => console.log(json))
+    } catch(err) {
+        console.error(err)
+    }
+}
 
-//     const test = () => {
-//         let tree = new LayoutComposite();
-
-//         let branch1 = new LayoutComposite();
-//         let branch2 = new LayoutComposite();
-//         let branch3 = new LayoutComposite();
-
-//         let leaf1 = new LeafString();
-//         let leaf2 = new LeafString();
-//         let leaf3 = new LeafString();
-//         let leaf4 = new LeafString();
-
-//         let variab1 = new LeafVariable('Glock', '&&');
-
-//         branch3.add(variab1)
-
-//         tree.add(branch1);
-//         tree.add(branch2);
-
-//         branch2.add(branch3);
-        
-//         branch3.add(leaf3);
-//         branch3.add(leaf1);
-//         branch2.add(leaf2);
-//         branch2.add(leaf1);
+export function LayoutComposer() {
+    const [jsString, setJsString] = useState('')
+    const [variabsString, setVariabsString] = useState('')
+    const [russianName, setRussianName] = useState('')
+    const [name, setName] = useState('');
+    const [priority, setPriority] = useState(3);
     
-//         leaf1.value = ' Да.'
-//         leaf2.value = ' Лист 2.'
-//         leaf3.value = ' Нет.'
-//         leaf4.value = ' Пробирка.'
+    const stringHandler = (ev: React.ChangeEvent<{value: string}>) => {
+        setJsString(ev.target.value)
+    }
 
-//         console.log(branch3.getValue);
-//         return (tree.getValue);
-//     }
+    const variabsHandler = (ev: React.ChangeEvent<{value: string}>) => {
+        setVariabsString(ev.target.value)
+    }
 
-//     useEffect(() => {
-//         setInputLayout(test())
-//     }, [])
 
-//     const handleInputLayout = (ev: React.ChangeEvent<HTMLTextAreaElement>) => {
-//         // console.log(splitString(ev.target.value as string))
-//         setInputLayout(ev.target.value as string)
-//     }
-
-//     return (
-//         <React.Fragment>
-//             <div>{inputLayout}</div>
-            
-//             <TextField
-//                 multiline
-//                 rows="5"
-//                 variant="outlined"
-//                 value={inputLayout}
-//                 style={{minWidth: 500}}
-//                 onChange={handleInputLayout}
-//             >
-//                 <span className="TEST">Stop</span>
-//             </TextField>
-//         </React.Fragment>
-//     )
-// }
+    return (
+        <div id="codenode">
+            <TextField
+                label="Имя шаблона (eng.)"
+                onChange={(ev: React.ChangeEvent<{value: string}>)=>{setName(ev.target.value)}}
+                value={name}
+                className="layoutInfo"
+            ></TextField>
+            <TextField
+                label="Имя шаблона (rus.)"
+                onChange={(ev: React.ChangeEvent<{value: string}>)=>{setRussianName(ev.target.value)}}
+                value={russianName}
+                className="layoutInfo"
+            ></TextField>
+            <TextField
+                label="lobster"
+                multiline
+                rows="10"
+                value={jsString}
+                onChange={stringHandler}
+                className="codefield"
+                variant="outlined"
+            ></TextField>
+            <div />
+            <TextField
+                label="Test"
+                multiline
+                rows="10"
+                value={variabsString}
+                onChange={variabsHandler}
+                className="codefield"
+                variant="outlined"
+            ></TextField>
+            <Button 
+                variant="contained" 
+                color="primary"
+                className="submit"
+                onClick={() => {toDbDirectly(formData(name, russianName, variabsString, jsString))}}
+            >
+                Send
+            </Button>
+            <p className="varStructureHint">
+                {'{\n\n"varName":"who_chooser",\n                "type":"select",\n                "russian_varName":"Кто сообщил?",\n                "innerVars":{\n                    "foo":"bar",\n                    "foz":"baz"\n                }\n            }'}
+            </p>
+        </div>
+    )
+}

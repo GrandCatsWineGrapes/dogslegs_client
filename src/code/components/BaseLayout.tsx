@@ -7,7 +7,7 @@ import LeftSideMenu from './LeftSideMenu';
 
 import 'normalize.css'
 import '../../styles/main.scss'
-import { LayoutCompositeComponent } from './LayoutCreator';
+import { LayoutComposer } from './LayoutCreator';
 
 
 export function BaseLayout() {
@@ -33,7 +33,7 @@ export function BaseLayout() {
                             <Route path="/test">
                                 <h1>Tests for now:</h1>
                                 <h3>Layout composite:</h3>
-                                <LayoutCompositeComponent />
+                                <LayoutComposer />
                             </Route>
                         </Switch>
                     </div>

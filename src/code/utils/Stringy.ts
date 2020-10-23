@@ -39,6 +39,7 @@ abstract class Stringy {
 
 }
 
+
 class BranchNode extends Stringy {
     private _children: Stringy[] = [];
     readonly baseType = 'BranchNode' 
