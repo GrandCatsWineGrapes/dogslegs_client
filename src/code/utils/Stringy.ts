@@ -1,4 +1,4 @@
-import { LeafString } from "./LayoutComposite";
+import { LeafString } from "./BoilerPlateComposite";
 
 declare type TOperator = '&&' | '||' | null;
 

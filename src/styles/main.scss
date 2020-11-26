@@ -4,11 +4,13 @@
 body {
     // background-color: #ebebeb;
     font-family: 'Roboto', sans-serif;
+    // background-image: $noise-background-image;
 }
 
 a {
     color: #181818;
     text-decoration: none;
+    
     &:link &:visited &:hover &:active{
         color: #181818;
         text-decoration: none;
@@ -20,14 +22,17 @@ a {
 
 .main-wrapper {
     display: grid;
-    grid-template-columns: 300px 1fr;
+    grid-template-columns: [leftside-menu] 300px [main-content] 1fr;
     width: 100vw;
     height: 100vh;
     background-color: #fafafa;
+    background-image: $noise-background-image;
+    
     .ls-menu {
         background-color: #fafafa;
         height: inherit;
-        background-image: $noise-background-image;
+        // background-image: $noise-background-image;
+        // background-image: $noise-background-image;
         // padding-top: 40px;
         // -webkit-box-shadow: 9px 12px 12px -6px rgba(0,0,0,0.58);
         // -moz-box-shadow: 9px 12px 12px -6px rgba(0,0,0,0.58);

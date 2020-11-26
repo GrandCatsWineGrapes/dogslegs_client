@@ -1,13 +1,13 @@
 import {createMuiTheme} from '@material-ui/core'
 import React, {useState} from 'react';
 import {BrowserRouter as Router, Switch, Route} from 'react-router-dom'
-import LayoutForm from './LayoutForm'
+import LayoutForm from './BoilerPlateForm'
 import LeftSideMenu from './LeftSideMenu';
 
 
 import 'normalize.css'
 import '../../styles/main.scss'
-import { LayoutComposer } from './LayoutCreator';
+import { LayoutComposer } from './BoilerPlateCreator';
 
 
 export function BaseLayout() {
@@ -31,8 +31,7 @@ export function BaseLayout() {
                                 Placeolder newlayout
                             </Route>
                             <Route path="/test">
-                                <h1>Tests for now:</h1>
-                                <h3>Layout composite:</h3>
+                                <h3>BoilerPlate creator:</h3>
                                 <LayoutComposer />
                             </Route>
                         </Switch>

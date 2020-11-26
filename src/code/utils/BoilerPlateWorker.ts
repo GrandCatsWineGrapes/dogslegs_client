@@ -1,4 +1,4 @@
-import { ILayout } from "../components/LayoutForm";
+import { ILayout } from "../components/BoilerPlateForm";
 
 export function layoutStringParser(layoutString: string) {
     // console.log(layoutString)

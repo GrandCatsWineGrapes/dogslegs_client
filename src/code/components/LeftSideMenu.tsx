@@ -30,22 +30,22 @@ export default function LeftSideMenu() {
         <React.Fragment>
             <Link to="/" className={styles.link}>
                 <Button variant="contained" className={styles["ls-menu__button"]}>
-                    Main
+                    Home page
                 </Button>
             </Link>
             <Link to="/layoutmaker" className={styles.link}>
                 <Button variant="contained" className={styles["ls-menu__button"]}>
-                    LayoutMaker
-                </Button>
-            </Link>
-            <Link to="/newlayout" className={styles.link}>
-                <Button variant="contained" className={styles["ls-menu__button"]}>
-                    New layout
+                    Form layout
                 </Button>
             </Link>
             <Link to="/test" className={styles.link}>
                 <Button variant="contained" className={styles["ls-menu__button"]}>
-                    Tests
+                    Create layout
+                </Button>
+            </Link>
+            <Link to="/newlayout" className={styles.link}>
+                <Button variant="contained" className={styles["ls-menu__button"]}>
+                    Change layout
                 </Button>
             </Link>
         </React.Fragment>
