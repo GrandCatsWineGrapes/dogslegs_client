@@ -10,12 +10,14 @@ module.exports = {
 	entry: './src/code/app.tsx',
 	output: {
 		path: path.join(__dirname, 'dist'),
-		filename: 'app.js'
+		filename: 'app.js',
+		publicPath: '/'
 	},
 	module: {
 		rules: [
 			{test: /\.(scss|css)$/, use: ['style-loader', 'css-loader', 'sass-loader']},
 			{test: /\.(ts|tsx)?$/, loader: 'awesome-typescript-loader'},
+			{test: /\.(png|jp?eg)/, loader: 'file-loader'}
 		]
 	},
 	plugins: [
@@ -24,6 +26,7 @@ module.exports = {
 	devServer: {
 		contentBase: path.join(__dirname, 'dist'),
 		compress: true,
-		port: 3001
+		port: 3001,
+		historyApiFallback: true
 	}
 }

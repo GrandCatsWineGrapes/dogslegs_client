@@ -28,6 +28,9 @@ export default function LeftSideMenu() {
     const styles = useStyles()
     return (
         <React.Fragment>
+            <div className="logo">
+                
+            </div>
             <Link to="/" className={styles.link}>
                 <Button variant="contained" className={styles["ls-menu__button"]}>
                     Home page

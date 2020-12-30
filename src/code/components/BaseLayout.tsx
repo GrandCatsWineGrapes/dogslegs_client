@@ -1,6 +1,6 @@
 import {createMuiTheme} from '@material-ui/core'
 import React, {useState} from 'react';
-import {BrowserRouter as Router, Switch, Route} from 'react-router-dom'
+import {BrowserRouter as BRouter, HashRouter as HRouter, Switch, Route} from 'react-router-dom'
 import LayoutForm from './BoilerPlateForm'
 import LeftSideMenu from './LeftSideMenu';
 
@@ -15,7 +15,7 @@ export function BaseLayout() {
     return (
         <div id="app">
             <div className="main-wrapper">
-                <Router>
+                <HRouter>
                     <div className="ls-menu">
                         <LeftSideMenu />
                     </div>
@@ -28,7 +28,7 @@ export function BaseLayout() {
                                 <LayoutForm/>
                             </Route>
                             <Route path="/newlayout">
-                                Placeolder newlayout
+                                Placeholder newlayout
                             </Route>
                             <Route path="/test">
                                 <h3>BoilerPlate creator:</h3>
@@ -36,7 +36,7 @@ export function BaseLayout() {
                             </Route>
                         </Switch>
                     </div>
-                </Router>
+                </HRouter>
             </div>
         </div>
     )

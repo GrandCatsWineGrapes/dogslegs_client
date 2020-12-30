@@ -188,11 +188,12 @@ export default function LayoutForm() {
     }, [])
 
     useEffect(() => {
+        let oldVarMap: Map<string, any> = variablesMap;
         variablesMap.clear();
         layouts.forEach(el => el.variables.forEach(el => {
             switch (el.type) {
                 case 'date':
-                    updateMap(el.varName, new Date())
+                    updateMap(el.varName, oldVarMap.get(el.varName) ? oldVarMap.get(el.varName) : new Date())
                     break;
                 case 'time':
                     updateMap(el.varName, new Date());
